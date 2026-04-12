@@ -90,10 +90,6 @@ export default function Page() {
                 Patient medicine schedule
               </h1>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              Choose a patient tab to see the daily medicine cards with name,
-              dose count, and when the medicine should be taken.
-            </p>
           </div>
         </section>
 
@@ -107,14 +103,15 @@ export default function Page() {
               <TabsTrigger
                 key={patient.id}
                 value={patient.id}
-                className="min-h-[56px] flex-col gap-1 rounded-3xl px-4 py-3 text-left"
+                className="min-h-[56px] flex-col gap-1 rounded-3xl px-4 py-3 text-left group-data-vertical/tabs:justify-center"
               >
                 <span className="text-sm font-semibold text-foreground">
                   {patient.name}
                 </span>
+                {/*
                 <span className="text-xs text-muted-foreground">
                   {patient.description}
-                </span>
+                </span>*/}
               </TabsTrigger>
             ))}
           </TabsList>
