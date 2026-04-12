@@ -1,8 +1,10 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useWindowSize } from "@/hooks/useWindowSize"
+import { getMedicines } from "@/lib/actions"
 
 const patientRecords = [
   {
@@ -72,6 +74,11 @@ function timeLabelClass(time: TimeLabel) {
 
 export default function Page() {
   const { width, height } = useWindowSize()
+  const [medicines, setMedicines] = useState<Record<string, unknown>[]>([])
+
+  useEffect(() => {
+    //getMedicines().then(setMedicines)
+  }, [])
 
   const isMobile = width < 768
   //const isTablet = width >= 768 && width < 1024;
@@ -208,6 +215,35 @@ export default function Page() {
             </TabsContent>
           ))}
         </Tabs>
+
+        <section className="space-y-4 rounded-3xl border border-border bg-card/90 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            Medicines from database
+          </h2>
+          {medicines.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {medicines.map((med, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-border bg-muted/40 p-4 text-sm"
+                >
+                  {Object.entries(med).map(([key, value]) => (
+                    <p key={key}>
+                      <span className="font-semibold text-foreground">
+                        {key}:
+                      </span>{" "}
+                      <span className="text-muted-foreground">
+                        {String(value)}
+                      </span>
+                    </p>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   )
