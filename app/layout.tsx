@@ -1,16 +1,19 @@
-import { Geist, Geist_Mono, Space_Grotesk, Noto_Serif } from "next/font/google"
+import { Inter, JetBrains_Mono } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
-const notoSerifHeading = Noto_Serif({subsets:['latin'],variable:'--font-heading'});
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
-const spaceGrotesk = Space_Grotesk({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
 })
 
 export default function RootLayout({
@@ -22,7 +25,12 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", spaceGrotesk.variable, notoSerifHeading.variable)}
+      className={cn(
+        "antialiased",
+        fontMono.variable,
+        "font-sans",
+        inter.variable
+      )}
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>
