@@ -1,9 +1,10 @@
 export type Medicine = {
   id: number
   created_at: Date
-  patient_id: number
-  medicine_id: number
-  effective_date: Date
+  name: string
+  dose: string
+  count: string
+  time: string
 }
 
 export type Patient = {
@@ -11,6 +12,23 @@ export type Patient = {
   name: string
   img_src: string
   created_at: Date
+  description: string
+  summary: string
+  medicines: Medicine[]
+}
+
+export type TimeLabel = "Morning" | "Evening" | "All day"
+
+export type PatientRecord = {
+  id: string
+  current_date: Date
+  patient_id: number
+  patient_name: string
+  medicine_id: number
+  medicine_name: string
+  time: TimeLabel
+  dose: string
+  count: string
 }
 
 export type MedicationScheduleEntry = {
@@ -22,13 +40,6 @@ export type MedicationScheduleEntry = {
 }
 
 export type DailyMedicationSchedule = {
-  effective_date_string: string
-  pets: {
-    patient_name: string
-    img_src: string
-    medicines: {
-      medicine_name: string
-      taken: boolean
-    }[]
-  }[]
+  date: Date
+  entries: Patient[]
 }
