@@ -2,56 +2,19 @@ import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PatientRecord, TimeLabel } from "@/lib/definitions"
 
-const patientRecords = [
-  {
-    id: "john-doe",
-    name: "John Doe",
-    description: "Type 2 Diabetes · Hypertension",
-    summary: "Take the medicines with breakfast and dinner.",
-    medicines: [
-      {
-        name: "Metformin",
-        dose: "500 mg",
-        count: "2 tablets",
-        time: "Morning",
-      },
-      { name: "Lisinopril", dose: "10 mg", count: "1 tablet", time: "Evening" },
-      { name: "Aspirin", dose: "81 mg", count: "1 tablet", time: "All day" },
-    ],
-  },
-  {
-    id: "mary-smith",
-    name: "Mary Smith",
-    description: "Asthma · Vitamin D deficiency",
-    summary: "Keep the inhaler handy and take vitamin later in the afternoon.",
-    medicines: [
-      { name: "Budesonide", dose: "200 mcg", count: "1 puff", time: "Morning" },
-      { name: "Albuterol", dose: "100 mcg", count: "2 puffs", time: "Evening" },
-      {
-        name: "Vitamin D",
-        dose: "1000 IU",
-        count: "1 capsule",
-        time: "All day",
-      },
-    ],
-  },
-  {
-    id: "alex-lee",
-    name: "Alex Lee",
-    description: "Migraine prevention · Sleep support",
-    summary: "Use the night dose before bedtime; keep water available.",
-    medicines: [
-      {
-        name: "Propranolol",
-        dose: "40 mg",
-        count: "1 tablet",
-        time: "Morning",
-      },
-      { name: "Melatonin", dose: "3 mg", count: "1 tablet", time: "Evening" },
-      { name: "Magnesium", dose: "250 mg", count: "1 tablet", time: "All day" },
-    ],
-  },
-]
+type PatientTabRecord = {
+  id: string
+  name: string
+  description: string
+  summary: string
+  medicines: Array<{
+    id: number
+    name: string
+    dose: string
+    count: string
+    time: TimeLabel
+  }>
+}
 
 
 function timeLabelClass(time: TimeLabel) {
@@ -67,41 +30,53 @@ function timeLabelClass(time: TimeLabel) {
   }
 }
 
-export default function MedicationTabs({patientRecords}: {patientRecords: PatientRecord[]}) {  
-    console.log(patientRecords)
-    const uniquePatientRecords = patientRecords.reduce((acc, record) => {
-        const key = record.patient_id
-        if (!acc[key]) {
-          acc[key] = [];
-        }
+export default function MedicationTabs({
+  patientRecords,
+}: {
+  patientRecords: PatientRecord[]
+}) {
+  const uniquePatientRecords = Object.values(
+    patientRecords.reduce<Record<number, PatientTabRecord>>((acc, record) => {
+      const key = record.patient_id
 
-        acc[key].push(record)
-        return acc
-    })
-    /*const uniquePatientRecords = Array.from(new Set(patientRecords.map(record => record.patient_id)))
-      .map(id => patientRecords.find(record => record.patient_id === id)!)
-      .map(record => ({
-        id: record.patient_id,
-        name: record.patient_name,
-        description: "",
-        summary: "",
-        medicines: patientRecords
-          .filter(r => r.patient_id === record.patient_id)
-          .map(r => ({
-            name: r.medicine_name,
-            dose: r.dose,
-            count: r.count,
-            time: r.time,
-          })),
-      }))*/
+      if (!acc[key]) {
+        acc[key] = {
+          id: String(record.patient_id),
+          name: record.patient_name,
+          description: "",
+          summary: "Today's medication schedule.",
+          medicines: [],
+        }
+      }
+
+      acc[key].medicines.push({
+        id: record.medicine_id,
+        name: record.medicine_name,
+        dose: record.dose,
+        count: record.count,
+        time: record.time,
+      })
+
+      return acc
+    }, {})
+  )
+
+  if (uniquePatientRecords.length === 0) {
+    return (
+      <section className="space-y-4 rounded-3xl border border-border bg-card/90 p-6 shadow-sm">
+        <p className="text-sm text-muted-foreground">No medication records for today.</p>
+      </section>
+    )
+  }
+
     return (
         <Tabs
-          defaultValue={patientRecords[0].id}
+          defaultValue={uniquePatientRecords[0].id}
           className="flex-col gap-4"
           orientation="vertical"
         >
           <TabsList className="scrollbar-hide flex min-h-[64px] w-full flex-col justify-start gap-2 overflow-x-auto pb-1 md:flex-row md:gap-0 md:overflow-visible">
-            {patientRecords.map((patient) => (
+            {uniquePatientRecords.map((patient) => (
               <TabsTrigger
                 key={patient.id}
                 value={patient.id}
@@ -118,7 +93,7 @@ export default function MedicationTabs({patientRecords}: {patientRecords: Patien
             ))}
           </TabsList>
 
-          {patientRecords.map((patient) => (
+          {uniquePatientRecords.map((patient) => (
             <TabsContent
               key={patient.id}
               value={patient.id}
@@ -168,7 +143,7 @@ export default function MedicationTabs({patientRecords}: {patientRecords: Patien
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {patient.medicines.map((medicine) => (
                   <div
-                    key={medicine.name}
+                    key={`${medicine.id}-${medicine.time}`}
                     className="rounded-3xl border border-border bg-card/90 p-5 shadow-sm transition hover:-translate-y-0.5"
                   >
                     <div className="flex items-center justify-between gap-4">
