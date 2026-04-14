@@ -1,8 +1,18 @@
 "use server"
 
 import { sql } from "@/lib/db"
-import { Medicine, PatientRecord } from "./definitions"
-import { Form } from "radix-ui"
+import { Medicine, Patient, PatientRecord } from "./definitions"
+
+interface MedicationPayload {
+  patient_id: string
+  medication_id: string
+  date_from: string
+  date_to: string
+  dose: string
+  quantity: string
+  timeComboBox: string[]
+  [key: string]: string | string[] // fallback for other fields
+}
 
 export async function getMedicines() {
   try {
@@ -16,7 +26,7 @@ export async function getMedicines() {
 
 export async function getPatients() {
   try {
-    const rows = (await sql`SELECT * FROM patient`) as Medicine[]
+    const rows = (await sql`SELECT * FROM patient`) as Patient[]
     return rows
   } catch (error) {
     console.error("Error fetching patients:", error)
@@ -24,9 +34,10 @@ export async function getPatients() {
   }
 }
 
-export async function getPatientRecords() { 
+export async function getPatientRecords() {
   try {
-    const rows = (await sql`select p.id as patient_id, p.name as patient_name, m.id as medicine_id, m.name as medicine_name, 
+    const rows =
+      (await sql`select p.id as patient_id, p.name as patient_name, m.id as medicine_id, m.name as medicine_name, 
       ms.time_label as time, ms.dose as dose, ms.quantity_text as count, CURRENT_DATE from medication_schedule ms 
       join medicine m on ms.medicine_id = m.id
       join patient p on ms.patient_id = p.id
@@ -38,12 +49,27 @@ export async function getPatientRecords() {
   }
 }
 
-export async function createMedicationRecord(formData: FormData): Promise<void> {
+export async function createMedicationRecord(
+  formData: FormData
+): Promise<void> {
   try {
-    // Here you would typically insert the new medication record into your database
-    // For example:
-    // await sql`INSERT INTO medication_schedule (patient_id, medicine_id, time_label, dose, quantity_text, start_date, end_date) VALUES (...)`
-    console.log("Creating medication record with data:", Object.fromEntries(formData.entries()))
+    const payload = {
+      ...Object.fromEntries(formData.entries()),
+      timeComboBox: formData.getAll("timeComboBox"),
+    }
+
+    const {
+      patient_id: patient_id,
+      medicine_id: medicine_id,
+      timeComboBox: timeslots,
+      dose: dose,
+      quantity: quantity_text,
+      date_from: start_date,
+      date_to: end_date,
+    } = payload as MedicationPayload
+
+    await sql`INSERT INTO medication_schedule (patient_id, medicine_id, time_label, dose, quantity_text, start_date, end_date) 
+    VALUES (${patient_id}, ${medicine_id}, ${timeslots.join(",")}, ${dose}, ${quantity_text}, ${start_date}, ${end_date})`
   } catch (error) {
     console.error("Error creating medication record:", error)
   }

@@ -14,7 +14,7 @@ export type Patient = {
   summary: string
 }
 
-export type TimeLabel = "Morning" | "Evening" | "All day"
+export type TimeLabel = "Morning" | "Evening" | "All Day"
 
 export type PatientRecord = {
   id: string
