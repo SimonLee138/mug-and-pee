@@ -2,6 +2,7 @@
 
 import { sql } from "@/lib/db"
 import { Medicine, PatientRecord } from "./definitions"
+import { Form } from "radix-ui"
 
 export async function getMedicines() {
   try {
@@ -9,6 +10,16 @@ export async function getMedicines() {
     return rows
   } catch (error) {
     console.error("Error fetching medicines:", error)
+    return []
+  }
+}
+
+export async function getPatients() {
+  try {
+    const rows = (await sql`SELECT * FROM patient`) as Medicine[]
+    return rows
+  } catch (error) {
+    console.error("Error fetching patients:", error)
     return []
   }
 }
@@ -24,5 +35,16 @@ export async function getPatientRecords() {
   } catch (error) {
     console.error("Error fetching patient records:", error)
     return []
+  }
+}
+
+export async function createMedicationRecord(formData: FormData): Promise<void> {
+  try {
+    // Here you would typically insert the new medication record into your database
+    // For example:
+    // await sql`INSERT INTO medication_schedule (patient_id, medicine_id, time_label, dose, quantity_text, start_date, end_date) VALUES (...)`
+    console.log("Creating medication record with data:", Object.fromEntries(formData.entries()))
+  } catch (error) {
+    console.error("Error creating medication record:", error)
   }
 }

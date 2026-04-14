@@ -2,9 +2,7 @@ export type Medicine = {
   id: number
   created_at: Date
   name: string
-  dose: string
-  count: string
-  time: string
+  description: string
 }
 
 export type Patient = {
@@ -14,7 +12,6 @@ export type Patient = {
   created_at: Date
   description: string
   summary: string
-  medicines: Medicine[]
 }
 
 export type TimeLabel = "Morning" | "Evening" | "All day"
